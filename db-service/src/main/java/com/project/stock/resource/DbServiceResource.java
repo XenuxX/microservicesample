@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.stock.model.Quote;
@@ -27,13 +28,32 @@ public class DbServiceResource {
 
 	@GetMapping("/{username}")
 	public List<String> getQuotes(@PathVariable("username") final String username) {
-		return quotesRepository.findByUserName(username).stream().map(Quote::getQuote).collect(Collectors.toList());
+		return getQuotesByUserName(username);
 
 	}
-	
+
+	/**
+	 * @param username
+	 * @return
+	 */
+	private List<String> getQuotesByUserName(final String username) {
+		return quotesRepository.findByUserName(username)
+				.stream().map(Quote::getQuote)
+				.collect(Collectors.toList());
+	}
+
+	@GetMapping
+	public List<String> getQuotes2(@RequestParam(value = "Joe") final String username) {
+		return getQuotesByUserName(username);
+
+	}
+
 	@PostMapping("/add")
-	public List<String> add(@RequestBody final Quotes quotes){
-		return null;
+	public List<String> add(@RequestBody final Quotes quotes) {
+		quotes.getQuotes().stream().map(quote -> new Quote(quotes.getUserName(), quote))
+				.forEach(quote -> quotesRepository.save(quote));
+
+		return getQuotesByUserName(quotes.getUserName()) ;
 	}
 
 }
