@@ -3,6 +3,7 @@ package com.project.stock.resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,16 +33,6 @@ public class DbServiceResource {
 
 	}
 
-	/**
-	 * @param username
-	 * @return
-	 */
-	private List<String> getQuotesByUserName(final String username) {
-		return quotesRepository.findByUserName(username)
-				.stream().map(Quote::getQuote)
-				.collect(Collectors.toList());
-	}
-
 	@GetMapping
 	public List<String> getQuotes2(@RequestParam(value = "Joe") final String username) {
 		return getQuotesByUserName(username);
@@ -53,7 +44,19 @@ public class DbServiceResource {
 		quotes.getQuotes().stream().map(quote -> new Quote(quotes.getUserName(), quote))
 				.forEach(quote -> quotesRepository.save(quote));
 
-		return getQuotesByUserName(quotes.getUserName()) ;
+		return getQuotesByUserName(quotes.getUserName());
+
+	}
+
+/*	@PostMapping("/delete/{username}")
+	public List<String> delete(@PathVariable("username") final String username) {
+		List<Quote> quotes = quotesRepository.findByUserName(username);
+		quotesRepository.delete(quotes);
+		return getQuotesByUserName(username);
+	}*/
+
+	private List<String> getQuotesByUserName(final String username) {
+		return quotesRepository.findByUserName(username).stream().map(Quote::getQuote).collect(Collectors.toList());
 	}
 
 }
